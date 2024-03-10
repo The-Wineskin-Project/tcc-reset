@@ -1,0 +1,68 @@
+#!/usr/bin/python3
+"""
+Completely reset TCC services database in macOS
+Note: Both the system and individual users have TCC databases; run the script as both
+      a user and as root to completely reset TCC decisions at all levels.
+2018-08-15: Resetting the 'Location' service fails; unknown cause
+2018-08-16: Confirmed the 'All' service does not really reset _all_
+            services, so individual calls to each service is necessary.
+2019-06-04: Still working in 10.15 beta :)
+2019-08-16: Added new Catalina services (thanks @frogor)
+2020-06-21: Removed 'Location' as we want to avoid needing to disable SIP
+2020-11-27: Corrected line `SystemPolicyDownloadsFolder` (thanks @tie)
+2022-04-03: Corrected parentheses for print lines (thanks @bizzare)
+"""
+
+import subprocess
+
+SERVICES = [
+    "Accessibility",
+    "AddressBook",
+    "All",
+    "AppleEvents",
+    "Calendar",
+    "Camera",
+    "ContactsFull",
+    "ContactsLimited",
+    "Facebook",
+    "FileProviderDomain",
+    "FileProviderPresence",
+    "LinkedIn",
+    "Liverpool",
+    "MediaLibrary",
+    "Microphone",
+    "Motion",
+    "Photos",
+    "PhotosAdd",
+    "PostEvent",
+    "Reminders",
+    "ScreenCapture",
+    "ShareKit",
+    "SinaWeibo",
+    "Siri",
+    "SpeechRecognition",
+    "SystemPolicyAllFiles",
+    "SystemPolicyDesktopFolder",
+    "SystemPolicyDeveloperFiles",
+    "SystemPolicyDocumentsFolder",
+    "SystemPolicyNetworkVolumes",
+    "SystemPolicyRemovableVolumes",
+    "SystemPolicySysAdminFiles",
+    "SystemPolicyDownloadsFolder",
+    "TencentWeibo",
+    "Twitter",
+    "Ubiquity",
+    "Willow",
+]
+
+
+if __name__ == "__main__":
+    for service in SERVICES:
+        cmd = ["/usr/bin/tccutil", "reset", service]
+        try:
+            subprocess.check_call(
+                cmd, stderr=subprocess.PIPE
+            )
+            print ("Reset"), service
+        except subprocess.CalledProcessError:
+            print ("Unable to reset"), service
